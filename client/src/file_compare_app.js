@@ -32,9 +32,9 @@ export default class App extends Component {
             displayCount: 1,
             downloadFileName: '',
             showRadio: false,
-            chechBoxValue:['-l','-li','-lE','-lZ','-lb','-lW','-la'],
-            chechBoxLabel:['Default','Ignore Case','Ignore Changes Due to Tab Expansion','Ignore White Space at Line End','Ignore Space Change ','Ignore All White Space','Treat all Files as Text'],
-            compareCondition: '-l'
+            chechBoxValue:['0','1','2'],
+            chechBoxLabel:['Default','Ignore Case','Ignore Space Change'],
+            compareCondition: '0'
           };
         this.child = React.createRef();
     }
@@ -45,11 +45,11 @@ export default class App extends Component {
         buttonState['comments']=buttonState['comments'];
         this.setState(buttonState);
         let state = this.state;
-        console.log(this.refs.customFile1.value);
-        console.log(this.refs.customFile2.value);
+        //console.log(this.refs.customFile1.value);
+        //console.log(this.refs.customFile2.value);
         let file1 = new FileReader();
         let file2 = new FileReader();
-        console.log(this.state.compareCondition)
+        //console.log(this.state.compareCondition)
         if (this.refs.customFile1.files[0]) {
             file1.readAsText(this.refs.customFile1.files[0]);
             state.file1Name = this.refs.customFile1.files[0].name;
@@ -62,7 +62,7 @@ export default class App extends Component {
         file2.onloadend = (e) => { state['file2'] = e.target.result; }
         let result = this.componentService.uploadFile(this.refs.customFile1.files[0], this.refs.customFile2.files[0], this.state.compareCondition);
         result.then((data) => {
-        console.log("response",data["response"]);
+        //console.log("response",data["response"]);
         if(data["response"].length==1&&data["response"][0]=="*#*#File Format Not Supported*#*#"){
           state['file1'] = "Sorry!!! File Format Not Supported"
         }
@@ -101,7 +101,9 @@ export default class App extends Component {
       }
 
     conditionCheckBoxChange(currentReference, state, event) {
-        state.compareCondition=event.currentTarget.value;
+      //console.log("checkBox checkBox checkBox",event)
+      let value=event.currentTarget.value;
+        state.compareCondition=event.currentTarget.checked?state.compareCondition+value:state.compareCondition.replace(value,"");
         currentReference.setState(state);
     }
 
@@ -111,7 +113,7 @@ export default class App extends Component {
       }
 
     invisticate(a,b,c){
-        console.log(a,b,c)
+        //console.log(a,b,c)
       }
     
     editDifference(){

@@ -18,6 +18,14 @@
   color: white;
 }
 
+.inner-text {
+    font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;
+    font-size: 12px;
+    overflow: visible;
+    white-space: pre;
+    word-wrap: normal;
+}
+
 .paddingTop-1{
   padding-top: 8px;
 }
@@ -36,9 +44,9 @@
   padding:2px
 }
 
-.line-no-width{
+.line-overflow{
   text-overflow: ellipsis;
-  width: 36px;
+  /*width: 36px;*/
 }
 .screen_background{
   display: block;
@@ -54,13 +62,56 @@
 }
 
 .bg-delete{
-  background-color: rgb(247, 211, 206)
+  background-color: #ffdce0
 }
 
+.bg-delete-changes{
+  background-color:#e4a4ac;
+}
 .bg-add{
-  background-color: rgb(207, 241, 200)
+  background-color: #cdffd8;
 }
 
+.bg-add-changes{
+  background-color:#a4dbb0;
+}
+.bg-lineno-delete{
+  background: #fdaeb7
+}
+
+.bg-lineno-add{
+  background: #bef5cb
+}
+
+.lineno{
+    cursor: pointer;
+    font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;
+    font-size: 12px;
+    line-height: 20px;
+    min-width: 50px;
+    padding-left: 10px;
+    padding-right: 10px;
+    text-align: right;
+    user-select: none;
+    vertical-align: top;
+    white-space: nowrap;
+    width: 1%;
+}
+
+.code{
+  line-height: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+  position: relative;
+  vertical-align: top;
+  width: 1170px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.pointer{
+  cursor: pointer
+}
 .display-none{
   display:none;
 }

@@ -4,125 +4,89 @@ const fs = require('fs');
 const Event = require('events');
 let event = new Event();
 module.exports = (app) => {
-
-    /**UUID function togenerate unique Id for for file name */
-    let create_UUID = () => {
-      let time = new Date().getTime();
-      let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-        var r = (time + Math.random() * 16) % 6 | 0;
-        time = Math.floor(time / 16);
-        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-      });
-      return uuid;
-    }
-
+	
     /** Compare the shell output and file */
-    let doFileCompare=(datafile,file1) => {
-      file1data=fs.readFileSync(file1,"utf8")
-      let data=fs.readFileSync(datafile,"utf8")
-      //console.log("454664546",file1data)
-      //console.log("9787445154",data.toString())
-      let inputfile=file1data.toString().split("\n");
-      console.log(inputfile);
+    let doFileCompare=(pythonOutput) => {
       let file1LineNo=0;
       let file2LineNo=0;
       let resultList=[]
-      let dataList=data.split("\n");
-      console.log(dataList);
-      dataList.map(line => {
-          line=line.trim();
-          pipeCompare=""
-          pipeCompare=inputfile[file1LineNo].trim();
-          console.log("pipeCompare",pipeCompare)
-          console.log("line",line.length)
-          if(pipeCompare.length>57){
-            pipeCompare=pipeCompare.substring(0,57)
-          }
-		  line=(line.replace(pipeCompare,"").trim()).trim();
-          if(line.endsWith("(")){
+      let dataList=pythonOutput.split("\n");
+      // console.log(dataList);
+	  for(var i=0;i<dataList.length;i++){
+		  line=dataList[i];
+          if(line.startsWith("+")){
+                resultList.push("+"+" "+file2LineNo);
+                file2LineNo+=1;
+          }else if(line.startsWith("-")){
+                resultList.push("-"+" "+file1LineNo);
+                file1LineNo+=1;
+          }else if(line.startsWith(" ")){
                 resultList.push("");
                 file1LineNo+=1;
                 file2LineNo+=1;
-          }else if(line.endsWith("<")){
-                resultList.push("-"+" "+file1LineNo);
-                file1LineNo+=1;
-          }else if(line.replace(pipeCompare,"").trim().startsWith("|")){
-                resultList.push("+-"+" "+file1LineNo+" "+file2LineNo);
-                file1LineNo+=1;
-                file2LineNo+=1;
-          }else if(line.startsWith(">")){
-                resultList.push("+"+" "+file2LineNo);
-                file2LineNo+=1;
-          }
-          // console.log("pipeCompare",pipeCompare);
-          // console.log("line",line)
-      })
+          }else if(line.startsWith("?")){
+              let lastValue=resultList.pop();
+                for(var j=0;j<line.length;j++){
+                    if("^"===line[j]||"-"===line[j]||"+"===line[j])
+                    {
+                        lastValue+=" "+(j-1);
+                    }
+                }
+                resultList.push(lastValue)
+              console.log(dataList[i-1])
+              console.log(dataList[i-1].length)
+              console.log(line)
+              console.log(line.length)
+			  i++;
+		  }
+      }
+      //console.log("resultList",resultList)
     if(resultList.length==0)
       resultList.push("*#*#File Format Not Supported*#*#")
-    console.log("resultList",resultList)
+    // console.log("resultList",resultList)
     return resultList;
     }
+	
     /**File Upload router part and shell execution */
     app.route("/uploadFile").post((request, res, next) => {
         process.on("error",(err)=>{
-          res.send({ 'response': 'check' , error:false })
-          console.log(err)
+        res.send({ 'response': 'check' , error:false })
+        console.log(err)
         })
+
         process.on('uncaughtException', (err) => {
-          console.log(err)
-          res.send({ 'response': 'check' , error:false })
-        });
-       // console.log(request.body);
-        condition = request.body.compareCondition.toString().replace(new RegExp(',','g'),' ');
-        // console.log("ha ha ha ha ha ha ha ah",condition)
-        //console.log("file1", request.files.file[0]);
-       //console.log("file2", request.files.file[1]);
-        let filename = []
-        let extend="";
-        for (var i = 0; i < 2; i++) {
-          let file = request.files.file[i];
-          extend = path.extname(request.files.file[i].name.toString());
-          filename.push(`${create_UUID()}${extend}`);
-          console.log(filename[0])
-          file.mv(`${__dirname}/public/${filename[i]}`, err => {
-            if (err) {
-              console.log(err);
-              event.emit("sendErrorResponse", err);
-              throw err;
-            }
-          });
-        }
-        let timeout = setTimeout(() => {
-            event.emit('sendErrorResponse', "File Format not Supported", res);
-            event.emit('doUnlink', filename);
-          }, 10000);
-        process1 = childProcess.spawn("sdiff", [condition.trim(),`${__dirname}\\public\\${filename[0]}`, `${__dirname}\\public\\${filename[1]}`]);
-        shellOutput=""
-        process1.stdout.on("data", (data) => {
-          shellOutput+=data.toString();
-        });
-        process1.on('close',()=>{
-          clearTimeout(timeout);
-          console.log("Hello World",shellOutput.toString())
-          filename.push(`${create_UUID()}${extend}`);
-          fs.writeFileSync(`${__dirname}\\public\\${filename[filename.length-1]}`, shellOutput.toString(),function(){});
-          //console.log(" Data=======",doFileCompare(data.toString('utf8'),request.files.file[0].toString('utf8')));
-          res.send({ 'response': doFileCompare(`${__dirname}\\public\\${filename[2]}`,`${__dirname}\\public\\${filename[0]}`), error:false });
-          event.emit('doUnlink', filename);
-        })
-        process1.on("error", (data) => { console.log("process error", data) });
-        process1.stderr.on("data", (data) => {
-            event.emit('sendErrorResponse', data, res);
-            event.emit('doUnlink', filename);
-            //console.log("script error", data.toString('utf8'));
-          });
+        console.log(err)
+        res.send({ 'response': 'check' , error:false })
         });
 
-        event.on('doUnlink', (filename) => {
-            fs.unlink(`${__dirname}\\public\\${filename[0]}`, () => { console.log(`${filename[0]} removed`) });
-            fs.unlink(`${__dirname}\\public\\${filename[1]}`, () => { console.log(`${filename[1]} removed`) });
-            fs.unlink(`${__dirname}\\public\\${filename[2]}`, () => { console.log(`${filename[2]} removed`) });
-          });
+        condition = request.body.compareCondition.toString().replace(new RegExp(',','g'),' ');
+        
+		console.log("condition",condition)
+		
+        let timeout = setTimeout(() => {
+            event.emit('sendErrorResponse', "File Format not Supported", res);
+        }, 10000);
+
+        process1 = childProcess.spawn("python", ["PyfileCompare.py",`${request.files.file[0].data.toString()}`,`${request.files.file[1].data.toString()}`,`${condition}`]);
+        shellOutput=""
+
+        process1.stdout.on("data", (data) => {
+        shellOutput+=data.toString();
+        });
+		
+		process1.stderr.on("data", (data) => {
+            event.emit('sendErrorResponse', data, res);
+        });
+
+        process1.on('close',()=>{
+        clearTimeout(timeout);
+        console.log(shellOutput.toString())
+        res.send({ 'response': doFileCompare(shellOutput.toString()), error:false });
+        })
+
+        process1.on("error", (data) => { console.log("process error", data) });
+            
+    });
 
         event.on('sendErrorResponse', (data, res) => {
             console.log("data", data.toString('utf8'));
