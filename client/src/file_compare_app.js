@@ -166,7 +166,7 @@ export default class App extends Component {
     render(){
         // return <div className="text-success text-center">Hello world</div>
       return (<div className="card">
-      <div className="text-center log"><img src="/icon.png" className="rounded" onClick={()=>{this.state.showFile=(this.state.showFile.length==0)?"display-none":"";this.setState(this.state);}}/><b>Compare your Files Here</b></div>
+      <div style={{"float":"left"}} className="text-center log"><img src="/icon.jpg" className="rounded" onClick={()=>{this.state.showFile=(this.state.showFile.length==0)?"display-none":"";this.setState(this.state);}}/><b>Compare your Files Here</b></div>
       <div className="row paddingLeft-1 display-none">
         <label className={" text-primary   " + this.state.alignmentCss + " " + this.state.showFile}  >Merged File</label>
         <label className={" text-primary   " + this.state.alignmentCssFile1 + " " + this.state.showFile1}  >{this.state.file1Name}</label>

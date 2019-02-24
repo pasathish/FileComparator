@@ -14,6 +14,6 @@ app.use(cors())
 app.use(bodyParser.urlencoded({
   extended : true
 }))
-git();
+//git();
 router(app);
 http.listen(port, () => console.log(`Listening on port ${port}`));
