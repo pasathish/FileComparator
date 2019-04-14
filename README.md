@@ -1,2 +1,2 @@
 # FileComparator
-Compare to file in local as wll as in remote git repository
+Compare to file in local as well as in remote git repository
